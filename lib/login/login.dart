@@ -1,3 +1,4 @@
+import 'package:donors/infopage/gold.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -190,9 +191,9 @@ class Login extends StatelessWidget {
                     child: StreamBuilder<bool>(
                       stream: bloc.canSubmit,
                       builder: (context, snapshot) => FloatingActionButton(
-                            onPressed: () {
-                              snapshot.hasData ? loginWithEmail(context) : null;
-                            },
+                            onPressed: () => snapshot.hasData
+                                ? loginWithEmail(context)
+                                : null,
                             child: Icon(
                               Icons.check,
                               size: 30,
@@ -225,8 +226,10 @@ class Login extends StatelessWidget {
   void loginWithGoogle(BuildContext context) async {
     googleSignInHandler().then((FirebaseUser user) {
       print(user);
-      var nav = AuthNavigator();
-      nav.storeUser(user, context);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => HomePage(user)),
+      );
     }).catchError((e) => print(e));
   }
 

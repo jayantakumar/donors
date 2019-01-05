@@ -1,3 +1,4 @@
+import 'package:donors/infopage/gold.dart';
 import 'package:flutter/material.dart';
 //import 'package:tale/main.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -18,7 +19,8 @@ class AuthNavigator {
     }).then((val) async {
       // await Future.delayed(Duration(seconds: 1));
       //Navigator.pop(context);
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (_) => HomePage(user)));
     });
   }
 }

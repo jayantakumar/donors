@@ -1,3 +1,4 @@
+import 'package:donors/infopage/gold.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -108,8 +109,8 @@ class SignUpMaster extends StatelessWidget {
                   ),
                   Center(
                     child: GestureDetector(
-                      onTap: () =>
-                          Navigator.of(context).pushNamed('/loginMaster'),
+                      onTap: () => Navigator.of(context)
+                          .pushReplacementNamed('/loginMaster'),
                       child: Padding(
                         padding: const EdgeInsets.only(bottom: 20.0),
                         child: Column(
@@ -150,8 +151,10 @@ class SignUpMaster extends StatelessWidget {
   void loginWithGoogle(BuildContext context) async {
     googleSignInHandler().then((FirebaseUser user) {
       print(user);
-      var nav = AuthNavigator();
-      nav.storeUser(user, context);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => HomePage(user)),
+      );
     }).catchError((e) => print(e));
   }
 

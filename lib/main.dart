@@ -1,3 +1,4 @@
+import 'package:donors/infopage/gold.dart';
 import 'package:flutter/material.dart';
 import 'package:donors/login/Signupmaster.dart';
 import 'package:donors/login/login.dart';
@@ -13,30 +14,19 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        fontFamily: "Courier",
+        textTheme: TextTheme(
+          title: TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ),
       home: SignUpMaster(),
       routes: {
         "/signup": (_) => Signup(),
         "/signupMaster": (_) => SignUpMaster(),
         "/login": (_) => Login(),
         "/loginMaster": (_) => LoginMaster(),
-        "/home": (_) => Home(),
       },
-    );
-  }
-}
-
-class Home extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Donor"),
-        centerTitle: true,
-        backgroundColor: Colors.teal,
-      ),
-      body: Container(
-        color: Colors.white,
-      ),
     );
   }
 }
