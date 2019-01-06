@@ -47,6 +47,15 @@ class _SearchState extends State<Search> {
   Widget build(BuildContext context) {
     final key = new GlobalKey<ScaffoldState>();
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.pinkAccent,
+        title: Text(
+          "Results",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        elevation: 0,
+        centerTitle: true,
+      ),
       key: key,
       body: ListView.builder(
         itemBuilder: (_, index) => ListTile(
