@@ -150,6 +150,7 @@ class _SearchState extends State<Search> {
     );
   }
 /*
+no change detected..
   @override
   Widget build(BuildContext context) {
     final key = new GlobalKey<ScaffoldState>();
