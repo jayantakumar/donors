@@ -29,7 +29,20 @@ class _HomePageState extends State<HomePage>
     }
   }
 
+  Future<Coordinates> getAddressCoordinates(String s) async {
+    if (s.length > 10) {
+      await Geocoder.local.findAddressesFromQuery(s).then((list) {
+        var first = list.first;
+        print(first.coordinates);
+        prefs.setString("AddressLat", first.coordinates.latitude.toString());
+        prefs.setString("AddressLong", first.coordinates.longitude.toString());
+        return first.coordinates;
+      }).catchError((e) => print(e));
+    }
+  }
+
   TextEditingController locationTextController = new TextEditingController();
+  TextEditingController addressTextController = new TextEditingController();
   Bloc bloc = new Bloc();
   @override
   void initState() {
@@ -205,6 +218,16 @@ class _HomePageState extends State<HomePage>
               SizedBox(
                 height: 40,
               ),
+              new TextField(
+                onChanged: (s) async {
+                  await getAddressCoordinates(s);
+                },
+                controller: addressTextController,
+                decoration: inputDecoration("Address", null),
+              ),
+              SizedBox(
+                height: 40,
+              ),
               StreamBuilder(
                 stream: bloc.phoneNo,
                 builder: (_, snapshot) => new TextField(
@@ -288,16 +311,19 @@ class _HomePageState extends State<HomePage>
                               snapshot.hasData
                           ? () {
                               infoSaver(
-                                  prefs.get("Name"),
-                                  int.parse(prefs.get("Age")),
-                                  int.parse(prefs.get("Weight")),
-                                  int.parse(prefs.get("PhoneNo")),
-                                  bloodGroup,
-                                  mapy[answer],
-                                  context,
-                                  widget.user,
-                                  double.parse(prefs.get("Lat")),
-                                  double.parse(prefs.get("Long")));
+                                prefs.get("Name"),
+                                int.parse(prefs.get("Age")),
+                                int.parse(prefs.get("Weight")),
+                                int.parse(prefs.get("PhoneNo")),
+                                bloodGroup,
+                                mapy[answer],
+                                context,
+                                widget.user,
+                                double.parse(prefs.get("Lat")),
+                                double.parse(prefs.get("Long")),
+                                double.parse(prefs.get("AddressLat")),
+                                double.parse(prefs.get("AddressLong")),
+                              );
                             }
                           : null,
                       child: Row(

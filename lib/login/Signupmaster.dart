@@ -1,4 +1,5 @@
 import 'package:donors/infopage/gold.dart';
+import 'package:donors/main/mainpage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -135,6 +136,34 @@ class SignUpMaster extends StatelessWidget {
                       ),
                     ),
                   ),
+                  Center(
+                    child: GestureDetector(
+                      onTap: () => Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(builder: (_) => MainPage())),
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 20.0),
+                        child: Column(
+                          children: <Widget>[
+                            Text(
+                              "Need blood?".toUpperCase(),
+                              textScaleFactor: 1.1,
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(
+                              height: 3.5,
+                            ),
+                            Center(
+                              child: Text(
+                                "Skip this".toUpperCase(),
+                                textScaleFactor: 1.1,
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  )
                 ],
               ),
             ),

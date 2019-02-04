@@ -53,85 +53,87 @@ class MainPageState extends State<MainPage> {
         elevation: 0,
         centerTitle: true,
       ),
-      body: Center(
-        child: Column(
-          //mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            SizedBox(
-              height: 50,
-            ),
-            SizedBox(
-              width: 300,
-              child: FlatButton(
-                padding: EdgeInsets.all(20),
-                color: Colors.green,
-                onPressed: () {},
-                child: Text(
-                  "Donate",
-                  textScaleFactor: 2.0,
-                  style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold),
-                ),
-                splashColor: Colors.red,
-                shape: RoundedRectangleBorder(
-                    side: BorderSide(color: Colors.black, width: 4),
-                    borderRadius: BorderRadius.circular(2)),
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            //mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              SizedBox(
+                height: 50,
               ),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            SizedBox(
-              width: 300,
-              child: FlatButton(
-                padding: EdgeInsets.all(20),
-                onPressed: () {
-                  showModalBottomSheet(
-                      context: context, builder: (_) => cp(context));
-                },
-                color: Colors.blue,
-                child: Text(
-                  "Select",
-                  textScaleFactor: 2.0,
-                  style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold),
+              SizedBox(
+                width: 300,
+                child: FlatButton(
+                  padding: EdgeInsets.all(20),
+                  color: Colors.green,
+                  onPressed: () {},
+                  child: Text(
+                    "Donate",
+                    textScaleFactor: 2.0,
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                  splashColor: Colors.red,
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(color: Colors.black, width: 4),
+                      borderRadius: BorderRadius.circular(2)),
                 ),
-                splashColor: Colors.red,
-                shape: RoundedRectangleBorder(
-                    side: BorderSide(color: Colors.black, width: 4),
-                    borderRadius: BorderRadius.circular(2)),
               ),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            SizedBox(
-              width: 300,
-              child: FlatButton(
-                padding: EdgeInsets.all(20),
-                onPressed: bloodGroup == null
-                    ? null
-                    : () {
-                        Navigator.of(context)
-                            .push(MaterialPageRoute(builder: (_) {
-                          return Search(bloodGroup);
-                        }));
-                      },
-                color: Colors.green,
-                disabledColor: Colors.green[100],
-                child: Text(
-                  "Search",
-                  textScaleFactor: 2.0,
-                  style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold),
+              SizedBox(
+                height: 20,
+              ),
+              SizedBox(
+                width: 300,
+                child: FlatButton(
+                  padding: EdgeInsets.all(20),
+                  onPressed: () {
+                    showModalBottomSheet(
+                        context: context, builder: (_) => cp(context));
+                  },
+                  color: Colors.blue,
+                  child: Text(
+                    "Select",
+                    textScaleFactor: 2.0,
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                  splashColor: Colors.red,
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(color: Colors.black, width: 4),
+                      borderRadius: BorderRadius.circular(2)),
                 ),
-                splashColor: Colors.red,
-                shape: RoundedRectangleBorder(
-                    side: BorderSide(color: Colors.black, width: 4),
-                    borderRadius: BorderRadius.circular(2)),
               ),
-            ),
-          ],
+              SizedBox(
+                height: 20,
+              ),
+              SizedBox(
+                width: 300,
+                child: FlatButton(
+                  padding: EdgeInsets.all(20),
+                  onPressed: bloodGroup == null
+                      ? null
+                      : () {
+                          Navigator.of(context)
+                              .push(MaterialPageRoute(builder: (_) {
+                            return Search(bloodGroup);
+                          }));
+                        },
+                  color: Colors.green,
+                  disabledColor: Colors.green[100],
+                  child: Text(
+                    "Search",
+                    textScaleFactor: 2.0,
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                  splashColor: Colors.red,
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(color: Colors.black, width: 4),
+                      borderRadius: BorderRadius.circular(2)),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

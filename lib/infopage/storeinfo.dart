@@ -14,6 +14,8 @@ infoSaver(
   FirebaseUser user,
   double lat,
   double long,
+  double addressLat,
+  double addressLong,
 ) async {
   Firestore firestore = Firestore.instance;
   firestore.settings(
@@ -28,7 +30,8 @@ infoSaver(
     "interval": interval,
     "email": user.email,
     "uid": user.uid,
-    "Location": GeoPoint(lat, long)
+    "Location": GeoPoint(lat, long),
+    "address": GeoPoint(addressLat, addressLong)
   }).then((v) {
     Navigator.of(context)
         .pushReplacement(MaterialPageRoute(builder: (context) => MainPage()));
