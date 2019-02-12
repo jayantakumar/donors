@@ -1,6 +1,8 @@
 import 'package:donors/main/recive.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:google_maps_webservice/places.dart';
+import 'package:donors/textboxstyle.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -12,8 +14,11 @@ class MainPage extends StatefulWidget {
 class MainPageState extends State<MainPage> {
   List<String> bloodList = ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"];
 
-  String bloodGroup;
+  final places =
+      new GoogleMapsPlaces(apiKey: "AIzaSyAvZgT5ebFfr-eSSCFRi3D_qmRnQMALloU");
+  String bloodGroup, hospitalName;
 
+  bool textBoxBool = false;
   CupertinoPicker cp(BuildContext context) => CupertinoPicker.builder(
       itemExtent: 40,
       useMagnifier: true,
@@ -46,7 +51,7 @@ class MainPageState extends State<MainPage> {
       appBar: AppBar(
         backgroundColor: Colors.pink,
         title: Text(
-          "Donor",
+          "DONORS",
           style: TextStyle(fontWeight: FontWeight.bold),
           textScaleFactor: 1.1,
         ),
@@ -61,22 +66,37 @@ class MainPageState extends State<MainPage> {
               SizedBox(
                 height: 50,
               ),
-              SizedBox(
-                width: 300,
-                child: FlatButton(
-                  padding: EdgeInsets.all(20),
-                  color: Colors.green,
-                  onPressed: () {},
-                  child: Text(
-                    "Donate",
-                    textScaleFactor: 2.0,
-                    style: TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold),
+              Padding(
+                padding: const EdgeInsets.all(30.0),
+                child: TextField(
+                  decoration: InputDecoration(
+                    errorText: textBoxBool ? "Cannot find" : null,
+                    labelText: "Hospital name",
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black, width: 4),
+                      borderRadius: BorderRadius.circular(0),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(0),
+                      borderSide: BorderSide(color: Colors.black54, width: 4),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(0),
+                      borderSide: BorderSide(color: Colors.red, width: 4),
+                    ),
                   ),
-                  splashColor: Colors.red,
-                  shape: RoundedRectangleBorder(
-                      side: BorderSide(color: Colors.black, width: 4),
-                      borderRadius: BorderRadius.circular(2)),
+                  onChanged: (s) {
+                    hospitalName = s;
+
+                    if (s.length < 5)
+                      setState(() {
+                        textBoxBool = true;
+                      });
+                    else
+                      setState(() {
+                        textBoxBool = false;
+                      });
+                  },
                 ),
               ),
               SizedBox(
@@ -115,7 +135,7 @@ class MainPageState extends State<MainPage> {
                       : () {
                           Navigator.of(context)
                               .push(MaterialPageRoute(builder: (_) {
-                            return Search(bloodGroup);
+                            return Search(bloodGroup, hospitalName);
                           }));
                         },
                   color: Colors.green,

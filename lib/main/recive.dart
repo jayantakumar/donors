@@ -2,13 +2,15 @@ import 'package:geolocator/geolocator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoder/geocoder.dart';
-import 'package:flutter/services.dart';
+
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:sms/sms.dart';
 
 class Search extends StatefulWidget {
-  Search(this.bloodGroup);
-  final String bloodGroup;
+  Search(this.bloodGroup, this.hospitalName);
+
+  final String bloodGroup, hospitalName;
+
   @override
   _SearchState createState() => _SearchState();
 }
@@ -34,12 +36,15 @@ class _SearchState extends State<Search> {
   Future<GeoPoint> getLoc() async {
     Position position = await Geolocator()
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.best);
+    List<Address> hospitalAddress =
+        await Geocoder.local.findAddressesFromQuery(widget.hospitalName);
+    print(hospitalAddress.first.coordinates);
     Coordinates point = Coordinates(position.latitude, position.longitude);
     List<Address> address =
         await Geocoder.local.findAddressesFromCoordinates(point);
     print(address.first.locality);
-    List<Address> newAddress =
-        await Geocoder.local.findAddressesFromQuery(address.first.locality);
+    List<Address> newAddress = await Geocoder.local
+        .findAddressesFromQuery(hospitalAddress.first.locality);
     return GeoPoint(newAddress.first.coordinates.latitude,
         newAddress.first.coordinates.longitude);
   }
@@ -70,8 +75,14 @@ class _SearchState extends State<Search> {
         onMapCreated: (c) {
           setState(() {
             controller = c;
-
             getLoc().then((o) {
+              controller.addMarker(MarkerOptions(
+                position: LatLng(o.latitude, o.longitude),
+                alpha: 1.0,
+                icon: BitmapDescriptor.defaultMarkerWithHue(100),
+                infoWindowText: InfoWindowText("Hospital", ""),
+                consumeTapEvents: false,
+              ));
               Firestore.instance
                   .collection("data")
                   .where('bloodgroup', isEqualTo: widget.bloodGroup)
@@ -93,52 +104,60 @@ class _SearchState extends State<Search> {
             });
           });
           controller.onMarkerTapped.add((Marker marker) async {
-            await Firestore.instance
-                .collection("data")
-                .where("name", isEqualTo: marker.options.infoWindowText.snippet)
-                //.where("address",
-                //  isEqualTo: GeoPoint(marker.options.position.latitude,
-                //    marker.options.position.longitude))
-                .getDocuments()
-                .then((query) {
-              print(query);
-              AlertDialog dialog = AlertDialog(
-                title:
-                    Text(marker.options.infoWindowText.snippet.toUpperCase()),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      "Phone no: ${query.documents[0]["phoneno"]}\n",
-                      style: TextStyle(fontWeight: FontWeight.w800),
-                    ),
-                    Text(
-                      "Blood Group: ${query.documents[0]["bloodgroup"]}\n",
-                      style: TextStyle(fontWeight: FontWeight.w800),
-                    ),
-                    Text(
-                      "Age: ${query.documents[0]["age"]}\n",
-                      style: TextStyle(fontWeight: FontWeight.w800),
-                    ),
-                  ],
-                ),
-                actions: <Widget>[
-                  IconButton(
-                      icon: Icon(Icons.message),
-                      onPressed: () {
-                        SmsSender sender = new SmsSender();
-                        sender.sendSms(
-                            new SmsMessage("9488418964", "Welcome to fluuter"));
-                      })
-                ],
-              );
-              showDialog(
-                context: context,
-                builder: (_) => dialog,
-              );
-            });
+            marker.options.infoWindowText.title != "Hospital"
+                ? await Firestore.instance
+                    .collection("data")
+                    .where("name",
+                        isEqualTo: marker.options.infoWindowText.snippet)
+                    //.where("address",
+                    //  isEqualTo: GeoPoint(marker.options.position.latitude,
+                    //    marker.options.position.longitude))
+                    .getDocuments()
+                    .then((query) {
+                    String phoneno = (query.documents[0]["phoneno"]).toString();
+                    print(query);
+                    AlertDialog dialog = AlertDialog(
+                      title: Text(
+                          marker.options.infoWindowText.snippet.toUpperCase()),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            "Phone no: $phoneno\n",
+                            style: TextStyle(fontWeight: FontWeight.w800),
+                          ),
+                          Text(
+                            "Blood Group: ${query.documents[0]["bloodgroup"]}\n",
+                            style: TextStyle(fontWeight: FontWeight.w800),
+                          ),
+                          Text(
+                            "Age: ${query.documents[0]["age"]}\n",
+                            style: TextStyle(fontWeight: FontWeight.w800),
+                          ),
+                        ],
+                      ),
+                      actions: <Widget>[
+                        IconButton(
+                            icon: Icon(Icons.message),
+                            onPressed: () {
+                              SmsSender sender = new SmsSender();
+                              String address = phoneno;
+                              print(address);
+                              address.replaceAll(" ", "");
+                              SmsMessage message =
+                                  new SmsMessage(address, 'Hello flutter!');
+                              sender.sendSms(message);
+                            })
+                      ],
+                    );
+                    showDialog(
+                      context: context,
+                      builder: (_) => dialog,
+                    );
+                  })
+                : () {};
           });
         },
         options: GoogleMapOptions(
