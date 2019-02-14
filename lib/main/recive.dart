@@ -2,14 +2,15 @@ import 'package:geolocator/geolocator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoder/geocoder.dart';
-
+import 'package:url_launcher/url_launcher.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:sms/contact.dart';
 import 'package:sms/sms.dart';
 
 class Search extends StatefulWidget {
-  Search(this.bloodGroup, this.hospitalName);
+  Search(this.bloodGroup, this.hospitalName, this.contactNo);
 
-  final String bloodGroup, hospitalName;
+  final String bloodGroup, hospitalName, contactNo;
 
   @override
   _SearchState createState() => _SearchState();
@@ -17,11 +18,15 @@ class Search extends StatefulWidget {
 
 class _SearchState extends State<Search> {
   var queryResult = [];
+  List<String> nearestPhoneNo = [];
   LatLng init = LatLng(0, 0);
   bool load = false, isEmpty = true;
+
   @override
   void initState() {
     queryResult = [];
+
+    nearestPhoneNo = [];
     getLoc().then((p) {
       setState(() {
         init = LatLng(p.latitude, p.longitude);
@@ -29,6 +34,7 @@ class _SearchState extends State<Search> {
             CameraPosition(target: init, zoom: 10)));
       });
     });
+
     initSearch();
     super.initState();
   }
@@ -47,6 +53,13 @@ class _SearchState extends State<Search> {
         .findAddressesFromQuery(hospitalAddress.first.locality);
     return GeoPoint(newAddress.first.coordinates.latitude,
         newAddress.first.coordinates.longitude);
+  }
+
+  Future<GeoPoint> getLocationOfHospital() async {
+    List<Address> hospitalAddress =
+        await Geocoder.local.findAddressesFromQuery(widget.hospitalName);
+    return GeoPoint(hospitalAddress.first.coordinates.latitude,
+        hospitalAddress.first.coordinates.longitude);
   }
 
   QuerySnapshot q;
@@ -68,6 +81,15 @@ class _SearchState extends State<Search> {
   }
 
   GoogleMapController controller;
+
+  Future launchPhone(String url) async {
+    url = "tel:" + url;
+
+    if (await canLaunch(url)) {
+      await launch(url);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,34 +97,55 @@ class _SearchState extends State<Search> {
         onMapCreated: (c) {
           setState(() {
             controller = c;
+
             getLoc().then((o) {
-              controller.addMarker(MarkerOptions(
-                position: LatLng(o.latitude, o.longitude),
-                alpha: 1.0,
-                icon: BitmapDescriptor.defaultMarkerWithHue(100),
-                infoWindowText: InfoWindowText("Hospital", ""),
-                consumeTapEvents: false,
-              ));
+              getLocationOfHospital()
+                  .then((locOfHospital) => controller.addMarker(MarkerOptions(
+                        position: LatLng(
+                            locOfHospital.latitude, locOfHospital.longitude),
+                        alpha: 1.0,
+                        icon: BitmapDescriptor.defaultMarkerWithHue(100),
+                        infoWindowText: InfoWindowText("Hospital", ""),
+                        consumeTapEvents: false,
+                      )));
+
               Firestore.instance
                   .collection("data")
                   .where('bloodgroup', isEqualTo: widget.bloodGroup)
                   .where("Location", isEqualTo: o)
                   .where("interval", isEqualTo: 0)
                   .getDocuments()
-                  .then((q) {
+                  .then((q) async {
+                GeoPoint hospital = await getLocationOfHospital();
+
                 for (int i = 0; i < q.documents.length; i++) {
                   GeoPoint p = q.documents[i].data["address"];
-                  print(p);
+                  double dist = await Geolocator().distanceBetween(p.latitude,
+                      p.longitude, hospital.latitude, hospital.longitude);
                   controller.addMarker(MarkerOptions(
                     position: LatLng(p.latitude, p.longitude),
-                    infoWindowText:
-                        InfoWindowText("Name", q.documents[i].data["name"]),
+                    infoWindowText: dist < 2000
+                        ? InfoWindowText(
+                            "NEARER : ", q.documents[i].data["name"])
+                        : InfoWindowText(
+                            "NAME : ", q.documents[i].data["name"]),
                     consumeTapEvents: true,
+                    icon: dist < 2000
+                        ? BitmapDescriptor.defaultMarkerWithHue(300)
+                        : BitmapDescriptor.defaultMarker,
                   ));
+                  dist < 2000
+                      ? nearestPhoneNo
+                          .add(q.documents[i].data["phoneno"].toString())
+                      : null;
                 }
+                Future.delayed(Duration(seconds: 2))
+                    .then(showSmsDialog(context, nearestPhoneNo));
+                print(nearestPhoneNo);
               });
             });
           });
+
           controller.onMarkerTapped.add((Marker marker) async {
             marker.options.infoWindowText.title != "Hospital"
                 ? await Firestore.instance
@@ -114,7 +157,7 @@ class _SearchState extends State<Search> {
                     //    marker.options.position.longitude))
                     .getDocuments()
                     .then((query) {
-                    String phoneno = (query.documents[0]["phoneno"]).toString();
+                    String phoneNo = (query.documents[0]["phoneno"]).toString();
                     print(query);
                     AlertDialog dialog = AlertDialog(
                       title: Text(
@@ -124,9 +167,15 @@ class _SearchState extends State<Search> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Text(
-                            "Phone no: $phoneno\n",
-                            style: TextStyle(fontWeight: FontWeight.w800),
+                          GestureDetector(
+                            onTap: () => launchPhone(phoneNo),
+                            child: Text(
+                              "Phone no: $phoneNo\n",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w800,
+                                color: Colors.blueAccent,
+                              ),
+                            ),
                           ),
                           Text(
                             "Blood Group: ${query.documents[0]["bloodgroup"]}\n",
@@ -143,11 +192,12 @@ class _SearchState extends State<Search> {
                             icon: Icon(Icons.message),
                             onPressed: () {
                               SmsSender sender = new SmsSender();
-                              String address = phoneno;
+
+                              String address = phoneNo;
                               print(address);
                               address.replaceAll(" ", "");
-                              SmsMessage message =
-                                  new SmsMessage(address, 'Hello flutter!');
+                              SmsMessage message = new SmsMessage(address,
+                                  'We need ${widget.bloodGroup} blood. if you are intrested please contact ${widget.contactNo} for conformation,Hospital: ${widget.hospitalName}');
                               sender.sendSms(message);
                             })
                       ],
@@ -157,7 +207,7 @@ class _SearchState extends State<Search> {
                       builder: (_) => dialog,
                     );
                   })
-                : () {};
+                : null;
           });
         },
         options: GoogleMapOptions(
@@ -167,6 +217,36 @@ class _SearchState extends State<Search> {
         ),
       ),
     );
+  }
+
+  showSmsDialog(BuildContext context, List<String> phoneNo) {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: Text("NOTE"),
+              content: Text(
+                "Send Sms to 5 people within 2 km Radius?",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              actions: <Widget>[
+                IconButton(
+                    icon: Icon(Icons.message),
+                    onPressed: () {
+                      SmsSender sender = new SmsSender();
+                      for (int i = 0;
+                          phoneNo.length < 5 ? i <= phoneNo.length : i <= 5;
+                          i++) {
+                        String address = phoneNo[i];
+                        print(address);
+                        address.replaceAll(" ", "");
+                        SmsMessage message = new SmsMessage(address,
+                            'We need ${widget.bloodGroup} blood. if you are intrested please contact ${widget.contactNo} for conformation,Hospital: ${widget.hospitalName}');
+                        sender.sendSms(message);
+                        Navigator.of(context).pop();
+                      }
+                    })
+              ],
+            ));
   }
 /*
 no change detected..

@@ -14,9 +14,10 @@ class MainPage extends StatefulWidget {
 class MainPageState extends State<MainPage> {
   List<String> bloodList = ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"];
 
+  TextEditingController controller;
   final places =
       new GoogleMapsPlaces(apiKey: "AIzaSyAvZgT5ebFfr-eSSCFRi3D_qmRnQMALloU");
-  String bloodGroup, hospitalName;
+  String bloodGroup, hospitalName, contactNo;
 
   bool textBoxBool = false;
   CupertinoPicker cp(BuildContext context) => CupertinoPicker.builder(
@@ -44,6 +45,12 @@ class MainPageState extends State<MainPage> {
           ),
         );
       });
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -126,6 +133,34 @@ class MainPageState extends State<MainPage> {
               SizedBox(
                 height: 20,
               ),
+              Padding(
+                padding: const EdgeInsets.all(30.0),
+                child: TextField(
+                    controller: controller,
+                    keyboardType: TextInputType.numberWithOptions(
+                        signed: false, decimal: false),
+                    decoration: InputDecoration(
+                      labelText: "Contact no",
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black, width: 4),
+                        borderRadius: BorderRadius.circular(0),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(0),
+                        borderSide: BorderSide(color: Colors.black54, width: 4),
+                      ),
+                      errorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(0),
+                        borderSide: BorderSide(color: Colors.red, width: 4),
+                      ),
+                    ),
+                    onChanged: (s) {
+                      contactNo = s;
+                    }),
+              ),
+              SizedBox(
+                height: 20,
+              ),
               SizedBox(
                 width: 300,
                 child: FlatButton(
@@ -135,7 +170,7 @@ class MainPageState extends State<MainPage> {
                       : () {
                           Navigator.of(context)
                               .push(MaterialPageRoute(builder: (_) {
-                            return Search(bloodGroup, hospitalName);
+                            return Search(bloodGroup, hospitalName, contactNo);
                           }));
                         },
                   color: Colors.green,

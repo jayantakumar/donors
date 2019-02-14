@@ -17,6 +17,7 @@ dependencies:
   firebase_messaging: ^2.1.0
   sms: ^0.2.4
   google_maps_webservice: ^0.0.11
+  url_launcher: ^4.0.1
   shared_preferences: ^0.4.3
   google_sign_in:
   firebase_auth:

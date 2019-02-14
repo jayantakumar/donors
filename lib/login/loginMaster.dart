@@ -1,4 +1,5 @@
 import 'package:donors/infopage/gold.dart';
+import 'package:donors/main/mainpage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -150,10 +151,8 @@ class LoginMaster extends StatelessWidget {
   void loginWithGoogle(BuildContext context) async {
     googleSignInHandler().then((FirebaseUser user) {
       print(user);
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => HomePage(user)),
-      );
+      Navigator.of(context)
+          .pushReplacement(MaterialPageRoute(builder: (context) => MainPage()));
     }).catchError((e) => print(e));
   }
 
