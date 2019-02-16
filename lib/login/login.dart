@@ -189,6 +189,22 @@ class Login extends StatelessWidget {
                     height: 15,
                   ),
                   Center(
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.of(context)
+                            .pushReplacementNamed('/loginMaster');
+                      },
+                      child: Text(
+                        "GO BACK",
+                        textScaleFactor: 1.1,
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Center(
                     child: StreamBuilder<bool>(
                       stream: bloc.canSubmit,
                       builder: (context, snapshot) => FloatingActionButton(
@@ -209,7 +225,7 @@ class Login extends StatelessWidget {
                     ),
                   ),
                   SizedBox(
-                    height: 30,
+                    height: 20,
                   ),
                 ],
               ),
@@ -237,10 +253,9 @@ class Login extends StatelessWidget {
   void loginWithEmail(BuildContext context) async {
     emailHandler(context).then((FirebaseUser user) {
       print(user);
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => HomePage(user)),
-      );
+
+      Navigator.of(context)
+          .pushReplacement(MaterialPageRoute(builder: (context) => MainPage()));
     }).catchError((e) {
       print(e);
     });

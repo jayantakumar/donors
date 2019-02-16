@@ -215,7 +215,7 @@ class LoginMaster extends StatelessWidget {
           borderRadius: BorderRadius.circular(0),
           side: BorderSide(color: Colors.black, width: 4.0),
         ),
-        onPressed: () => Navigator.of(context).pushNamed('/login'),
+        onPressed: () => Navigator.of(context).pushReplacementNamed('/login'),
         child: Row(
           children: <Widget>[
             SizedBox(

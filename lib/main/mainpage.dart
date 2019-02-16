@@ -1,8 +1,10 @@
 import 'package:donors/main/recive.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_maps_webservice/places.dart';
 import 'package:donors/textboxstyle.dart';
+import 'confirmation.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -18,7 +20,7 @@ class MainPageState extends State<MainPage> {
   final places =
       new GoogleMapsPlaces(apiKey: "AIzaSyAvZgT5ebFfr-eSSCFRi3D_qmRnQMALloU");
   String bloodGroup, hospitalName, contactNo;
-
+  var currentuser;
   bool textBoxBool = false;
   CupertinoPicker cp(BuildContext context) => CupertinoPicker.builder(
       itemExtent: 40,
@@ -48,8 +50,19 @@ class MainPageState extends State<MainPage> {
 
   @override
   void dispose() {
-    controller.dispose();
+    controller?.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    FirebaseAuth.instance.currentUser().then((u) {
+      setState(() {
+        currentuser = u;
+      });
+    });
+
+    super.initState();
   }
 
   @override
@@ -64,6 +77,18 @@ class MainPageState extends State<MainPage> {
         ),
         elevation: 0,
         centerTitle: true,
+        actions: <Widget>[
+          IconButton(
+              icon: Icon(Icons.close),
+              onPressed: currentuser != null
+                  ? () async {
+                      print(currentuser);
+                      await FirebaseAuth.instance.signOut();
+                      Navigator.of(context)
+                          .pushReplacementNamed("/signupMaster");
+                    }
+                  : null),
+        ],
       ),
       body: SingleChildScrollView(
         child: Center(
@@ -106,33 +131,6 @@ class MainPageState extends State<MainPage> {
                   },
                 ),
               ),
-              SizedBox(
-                height: 20,
-              ),
-              SizedBox(
-                width: 300,
-                child: FlatButton(
-                  padding: EdgeInsets.all(20),
-                  onPressed: () {
-                    showModalBottomSheet(
-                        context: context, builder: (_) => cp(context));
-                  },
-                  color: Colors.blue,
-                  child: Text(
-                    "Select",
-                    textScaleFactor: 2.0,
-                    style: TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold),
-                  ),
-                  splashColor: Colors.red,
-                  shape: RoundedRectangleBorder(
-                      side: BorderSide(color: Colors.black, width: 4),
-                      borderRadius: BorderRadius.circular(2)),
-                ),
-              ),
-              SizedBox(
-                height: 20,
-              ),
               Padding(
                 padding: const EdgeInsets.all(30.0),
                 child: TextField(
@@ -165,6 +163,33 @@ class MainPageState extends State<MainPage> {
                 width: 300,
                 child: FlatButton(
                   padding: EdgeInsets.all(20),
+                  onPressed: () {
+                    showModalBottomSheet(
+                        context: context, builder: (_) => cp(context));
+                  },
+                  color: Colors.blue,
+                  child: Text(
+                    "Select",
+                    textScaleFactor: 2.0,
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                  splashColor: Colors.red,
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(color: Colors.black, width: 4),
+                      borderRadius: BorderRadius.circular(2)),
+                ),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              SizedBox(
+                width: 300,
+                child: FlatButton(
+                  padding: EdgeInsets.all(20),
                   onPressed: bloodGroup == null
                       ? null
                       : () {
@@ -187,6 +212,40 @@ class MainPageState extends State<MainPage> {
                       borderRadius: BorderRadius.circular(2)),
                 ),
               ),
+              SizedBox(
+                height: 20,
+              ),
+              SizedBox(
+                width: 300,
+                child: FlatButton(
+                  padding: EdgeInsets.all(20),
+                  onPressed: () {
+                    Navigator.of(context).push(MaterialPageRoute(builder: (_) {
+                      return Check();
+                    }));
+                  },
+                  color: Colors.green,
+                  disabledColor: Colors.green[100],
+                  child: Center(
+                    child: Text(
+                      "confirm the user who accepted your offer",
+                      textScaleFactor: 1.2,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  splashColor: Colors.red,
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(color: Colors.black, width: 4),
+                      borderRadius: BorderRadius.circular(2)),
+                ),
+              ),
+              SizedBox(
+                height: 20,
+              )
             ],
           ),
         ),

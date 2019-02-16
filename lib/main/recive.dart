@@ -225,7 +225,7 @@ class _SearchState extends State<Search> {
         builder: (context) => AlertDialog(
               title: Text("NOTE"),
               content: Text(
-                "Send Sms to 5 people within 2 km Radius?",
+                "Send Sms to 5 people within 2 km Radius?  \n(if yes press the message button)",
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               actions: <Widget>[
