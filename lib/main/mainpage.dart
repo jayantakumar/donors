@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_maps_webservice/places.dart';
-import 'package:donors/textboxstyle.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'confirmation.dart';
 
 class MainPage extends StatefulWidget {
@@ -229,6 +229,235 @@ class MainPageState extends State<MainPage> {
                   child: Center(
                     child: Text(
                       "confirm the user who accepted your offer",
+                      textScaleFactor: 1.2,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  splashColor: Colors.red,
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(color: Colors.black, width: 4),
+                      borderRadius: BorderRadius.circular(2)),
+                ),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              SizedBox(
+                width: 300,
+                child: FlatButton(
+                  padding: EdgeInsets.all(20),
+                  onPressed: () {
+                    Navigator.of(context).push(MaterialPageRoute(builder: (_) {
+                      return MonthlyStatus();
+                    }));
+                  },
+                  color: Colors.green,
+                  disabledColor: Colors.green[100],
+                  child: Center(
+                    child: Text(
+                      "CHANGE YOUR MONTHLY STATUS",
+                      textScaleFactor: 1.2,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  splashColor: Colors.red,
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(color: Colors.black, width: 4),
+                      borderRadius: BorderRadius.circular(2)),
+                ),
+              ),
+              SizedBox(
+                height: 20,
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class MonthlyStatus extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(),
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              SizedBox(
+                height: 20,
+              ),
+              SizedBox(
+                width: 300,
+                child: FlatButton(
+                  padding: EdgeInsets.all(20),
+                  onPressed: () {
+                    String uid;
+                    QuerySnapshot query;
+                    FirebaseAuth.instance.currentUser().then((s) => Firestore
+                            .instance
+                            .collection("/data")
+                            .where("uid", isEqualTo: s.uid)
+                            .getDocuments()
+                            .then((q) {
+                          var docID = q.documents[0].documentID;
+                          Firestore.instance
+                              .document("data/$docID")
+                              .updateData({"interval": 1});
+                        }));
+                  },
+                  color: Colors.green,
+                  disabledColor: Colors.green[100],
+                  child: Center(
+                    child: Text(
+                      "1 month ago",
+                      textScaleFactor: 1.2,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  splashColor: Colors.red,
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(color: Colors.black, width: 4),
+                      borderRadius: BorderRadius.circular(2)),
+                ),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              SizedBox(
+                width: 300,
+                child: FlatButton(
+                  padding: EdgeInsets.all(20),
+                  onPressed: () {
+                    String uid;
+                    QuerySnapshot query;
+                    FirebaseAuth.instance.currentUser().then((s) => Firestore
+                            .instance
+                            .collection("/data")
+                            .where("uid", isEqualTo: s.uid)
+                            .getDocuments()
+                            .then((q) {
+                          var docID = q.documents[0].documentID;
+                          Firestore.instance
+                              .document("data/$docID")
+                              .updateData({"interval": 2});
+                        }));
+                  },
+                  color: Colors.green,
+                  disabledColor: Colors.green[100],
+                  child: Center(
+                    child: Text(
+                      "2 months ago",
+                      textScaleFactor: 1.2,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  splashColor: Colors.red,
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(color: Colors.black, width: 4),
+                      borderRadius: BorderRadius.circular(2)),
+                ),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              SizedBox(
+                width: 300,
+                child: FlatButton(
+                  padding: EdgeInsets.all(20),
+                  onPressed: () {
+                    String uid;
+                    QuerySnapshot query;
+                    FirebaseAuth.instance.currentUser().then((s) => Firestore
+                            .instance
+                            .collection("/data")
+                            .where("uid", isEqualTo: s.uid)
+                            .getDocuments()
+                            .then((q) {
+                          var docID = q.documents[0].documentID;
+                          Firestore.instance
+                              .document("data/$docID")
+                              .updateData({"interval": 3});
+                        }));
+                  },
+                  color: Colors.green,
+                  disabledColor: Colors.green[100],
+                  child: Center(
+                    child: Text(
+                      "3 months ago",
+                      textScaleFactor: 1.2,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  splashColor: Colors.red,
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(color: Colors.black, width: 4),
+                      borderRadius: BorderRadius.circular(2)),
+                ),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              SizedBox(
+                width: 300,
+                child: FlatButton(
+                  padding: EdgeInsets.all(20),
+                  onPressed: () {
+                    String uid;
+                    QuerySnapshot query;
+                    FirebaseAuth.instance.currentUser().then((s) => Firestore
+                            .instance
+                            .collection("/data")
+                            .where("uid", isEqualTo: s.uid)
+                            .getDocuments()
+                            .then((q) {
+                          var docID = q.documents[0].documentID;
+                          Firestore.instance
+                              .document("data/$docID")
+                              .updateData({"interval": 0});
+                        }));
+                  },
+                  color: Colors.green,
+                  disabledColor: Colors.green[100],
+                  child: Center(
+                    child: Text(
+                      "More than that",
                       textScaleFactor: 1.2,
                       style: TextStyle(
                         color: Colors.white,
