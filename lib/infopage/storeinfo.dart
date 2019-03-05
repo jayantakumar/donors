@@ -21,19 +21,21 @@ infoSaver(
   firestore.settings(
     timestampsInSnapshotsEnabled: true,
   );
-  await firestore.collection('/data').add({
-    "name": name,
-    "age": age,
-    "weight": weight,
-    "phoneno": phoneNo,
-    "bloodgroup": bloodGroup,
-    "interval": interval,
-    "email": user.email,
-    "uid": user.uid,
-    "Location": GeoPoint(lat, long),
-    "address": GeoPoint(addressLat, addressLong)
-  }).then((v) {
-    Navigator.of(context)
-        .pushReplacement(MaterialPageRoute(builder: (context) => MainPage()));
+  FirebaseAuth.instance.currentUser().then((u) async {
+    await firestore.collection('/data').document("${u.uid}").setData({
+      "name": name,
+      "age": age,
+      "weight": weight,
+      "phoneno": phoneNo,
+      "bloodgroup": bloodGroup,
+      "interval": interval,
+      "email": user.email,
+      "uid": user.uid,
+      "Location": GeoPoint(lat, long),
+      "address": GeoPoint(addressLat, addressLong)
+    }).then((v) {
+      Navigator.of(context)
+          .pushReplacement(MaterialPageRoute(builder: (context) => MainPage()));
+    });
   });
 }
